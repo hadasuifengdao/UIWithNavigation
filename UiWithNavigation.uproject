@@ -1,0 +1,13 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "{7D87BBEE-4DE6-B68F-215A-048DF11B833F}",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "UiWithNavigation",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}
