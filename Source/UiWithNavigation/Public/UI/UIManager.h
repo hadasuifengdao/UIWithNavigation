@@ -76,7 +76,6 @@ class  UIWITHNAVIGATION_API UUIManager : public UObject
 public:	
 
 	UUIManager();
-
 	//枚举->FName
 	template<typename TEnum>
 	static FORCEINLINE FName GetEnumValueAsName(const FString& Name, TEnum Value)
@@ -90,6 +89,9 @@ public:
 	}
 
 	void OpenUI(FName UIID, EUIOpenWay OpenWay);
+
+	UFUNCTION(BlueprintCallable)
+	void Clear();
 
 	UFUNCTION(BlueprintCallable)
 	UUIBase* GetCurrentUI();

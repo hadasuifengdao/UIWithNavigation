@@ -13,7 +13,9 @@
 // Sets default values for this component's properties
 UUIManager::UUIManager()
 {
-
+	ConstructorHelpers::FObjectFinder<UDataTable> Finder(TEXT("/Game/DataTable/UiDataTable"));
+	UIDataTable = Finder.Object;
+	check(UIDataTable);
 }
 
 void UUIManager::OpenUI(FName UIID, EUIOpenWay OpenWay)
@@ -62,6 +64,31 @@ void UUIManager::OpenUI(FName UIID, EUIOpenWay OpenWay)
 	FLatentActionManager& LatentActionManager = GetWorld()->GetLatentActionManager();
 	LatentActionManager.ProcessLatentActions(this, GetWorld()->GetDeltaSeconds());
 
+}
+
+void UUIManager::Clear()
+{
+	if (UIStack.Num() == 0)
+	{
+		return;
+	}
+
+	FName BottomUIID = UIStack[0];
+
+	WaitingOpenUI.Reset();
+
+	for (auto it : UIStack)
+	{
+		UUIBase** pUI = UICache.Find(it);
+		if (pUI && IsValid(*pUI) && (*pUI)->IsInViewport() && (*pUI)->AnimState != EUIAnimState::Closed)
+		{
+			(*pUI)->AnimState = EUIAnimState::Closed;
+			(*pUI)->RemoveFromParent();
+		}
+	}
+	UIStack.Empty();
+
+	Internal_ExitUIMode(BottomUIID);
 }
 
 UUIBase* UUIManager::Internal_OpenUI(FName UIID)
@@ -144,7 +171,7 @@ void UUIManager::UIClosedCallBack(FName UIID)
 
 	if (UIStack.Top() != UIID)
 	{
-		UE_LOG(LogTemp, Error, TEXT("UPaladinUIManager::UIClosedCallBack Error. StackTop:%s Cloased:%s"), *UIStack.Top().ToString(), *UIID.ToString());
+		UE_LOG(LogTemp, Error, TEXT("UUIManager::UIClosedCallBack Error. StackTop:%s Clo	sed:%s"), *UIStack.Top().ToString(), *UIID.ToString());
 		return;
 	}
 
@@ -250,5 +277,9 @@ void UUIManager::PrintDebug()
 
 		//APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 		//GEngine->AddOnScreenDebugMessage((uint64)-1, 0, DebugTextColor, bLastControlDeviceIsGamepad ? TEXT("Last Control Device Is Gamepad.") : TEXT("Last Control Device Is NotGamepad."));
+	}
+	if (AGameModeBase* GMInstance = Cast<AGameModeBase>(GetOuter()))
+	{
+		GMInstance->GetWorldTimerManager().SetTimerForNextTick(this, &UUIManager::PrintDebug);
 	}
 }
