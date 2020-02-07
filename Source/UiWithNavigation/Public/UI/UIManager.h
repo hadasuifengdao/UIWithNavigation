@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "Engine/LatentActionManager.h"
 #include "Engine/DataTable.h"
+#include "UI/MyNavigationConfig.h"
 #include "UIManager.generated.h"
 
 UENUM(BlueprintType)
@@ -66,6 +67,16 @@ struct UIWITHNAVIGATION_API FUIData : public FTableRowBase
 	bool PauseGame = false;
 };
 
+USTRUCT(Blueprintable)
+struct UIWITHNAVIGATION_API FUISoundData : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly)
+	class USoundCue* Sound = NULL;
+
+};
+
 
 UCLASS(Blueprintable, BlueprintType)
 class  UIWITHNAVIGATION_API UUIManager : public UObject
@@ -98,6 +109,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void PrintDebug();
+
+	void PlayPanelNavigationSound(class UPanelWidget* NavigationParentPanel);
+	void PlayWidgetNavigationSound(class UNavigationUserWidgetBase* Widget, EUIKeyControlType UIKeyControlType, EUINavigation UINavigation);
 private:
 	UUIBase* Internal_OpenUI(FName UIID);
 
@@ -111,6 +125,9 @@ protected:
 
 	UPROPERTY()
 	class UDataTable* UIDataTable;
+
+	UPROPERTY()
+	class UDataTable* UISoundDataTable;
 
 	UPROPERTY()
 	TMap<FName, class UUIBase*> UICache;

@@ -8,6 +8,9 @@
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Engine.h"
 #include "Slate/SObjectWidget.h"
+#include "Sound/SoundCue.h"
+#include "UI/NavigationUserWidget.h"
+#include "UI/NavigationWidgetPanelInterface.h"
 
 
 // Sets default values for this component's properties
@@ -281,5 +284,74 @@ void UUIManager::PrintDebug()
 	if (AGameModeBase* GMInstance = Cast<AGameModeBase>(GetOuter()))
 	{
 		GMInstance->GetWorldTimerManager().SetTimerForNextTick(this, &UUIManager::PrintDebug);
+	}
+}
+
+void UUIManager::PlayPanelNavigationSound(UPanelWidget* NavigationParentPanel)
+{
+	if (INavigationWidgetPanelInterface* Interface = Cast<INavigationWidgetPanelInterface>(NavigationParentPanel))
+	{
+		if (Interface->CustomNavigationSound)
+		{
+			UGameplayStatics::SpawnSound2D(GetWorld(), Interface->CustomNavigationSound);
+		}
+		else
+		{
+			FName ConstantKey;
+			switch (Interface->GetControlType())
+			{
+			case EUIKeyControlType::DirectionNavigation:
+				ConstantKey = TEXT("DirectionNavigationSound");
+				break;
+			case EUIKeyControlType::ChangePage:
+				ConstantKey = TEXT("ChangePageSound");
+				break;
+			case EUIKeyControlType::ChangePage2:
+				ConstantKey = TEXT("ChangePage2Sound");
+				break;
+			default:
+				return;
+			}
+			USoundCue* NavigationSound=nullptr;
+			FUISoundData* UISoundData = UIDataTable->FindRow<FUISoundData>(ConstantKey, TEXT("UIDataTable->FindRow"));
+			if (UISoundData && UISoundData->Sound)
+			{
+				NavigationSound = UISoundData->Sound;
+			}
+			if (NavigationSound)
+			{
+				UGameplayStatics::SpawnSound2D(GetWorld(), NavigationSound);
+
+			}
+		}
+	}
+}
+void UUIManager::PlayWidgetNavigationSound(class UNavigationUserWidgetBase* Widget, EUIKeyControlType UIKeyControlType, EUINavigation UINavigation)
+{
+	USoundCue* Sound = nullptr;
+	if (USoundCue** ConfigSoundPtr = Widget->CustomSoundConfig.Find(FUINavigationKey(UIKeyControlType, UINavigation)))
+	{
+		Sound = *ConfigSoundPtr;
+	}
+	else
+	{
+		FName AssetName;
+		if (UIKeyControlType == EUIKeyControlType::Confirm && UINavigation == EUINavigation::Next)
+		{
+			AssetName = TEXT("UIConfirmCommonSound");
+		}
+		else if (UIKeyControlType == EUIKeyControlType::Confirm && UINavigation == EUINavigation::Previous)
+		{
+			AssetName = TEXT("UICancelCommonSound");
+		}
+		FUISoundData* UISoundData = UIDataTable->FindRow<FUISoundData>(AssetName, TEXT("UIDataTable->FindRow"));
+		if (UISoundData&&UISoundData->Sound)
+		{
+			Sound = UISoundData->Sound;
+		}	
+	}
+	if (Sound)
+	{
+		UGameplayStatics::SpawnSound2D(GetWorld(), Sound);
 	}
 }

@@ -23,7 +23,8 @@ public:
 	static class AUiWithNavigationGameMode* GetGameMode();
 
 	UFUNCTION(BlueprintCallable)
-	class UUIManager* GetUIManager();
+	static class UUIManager* GetUIManager();
+
 protected:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UUIManager> UIManagerClass;
