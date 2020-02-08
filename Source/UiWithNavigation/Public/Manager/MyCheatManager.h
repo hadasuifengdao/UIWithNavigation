@@ -19,6 +19,11 @@ class UIWITHNAVIGATION_API UMyCheatManager : public UCheatManager
 	void OpenUI(FName sUIID, int32 OpenWay);
 
 	UFUNCTION(exec)
+	void DebugUI(bool bNewValue);
+
+	UFUNCTION(exec)
 	void ClearUI();
-	
+
+public:
+	static  bool bUIDebug;
 };

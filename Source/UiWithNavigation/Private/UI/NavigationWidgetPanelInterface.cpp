@@ -53,7 +53,7 @@ void INavigationWidgetPanelInterface::ChildRequestBeSelected(UNavigationUserWidg
 	if ((WidgetIndex != INDEX_NONE) && (OnSelctedNumber != WidgetIndex))
 	{
 		OnSelctedNumber = WidgetIndex;
-		OnSelectedChildChangedDelegate.Execute();
+		OnSelectedChildChangedDelegate.Broadcast();
 	}
 }
 UNavigationUserWidget* INavigationWidgetPanelInterface::GetSelectedChild()
@@ -67,7 +67,7 @@ UNavigationUserWidget* INavigationWidgetPanelInterface::GetSelectedChild()
 	return nullptr;
 }
 
-void INavigationWidgetPanelInterface::PanelNavigation(const FNavigationEvent& NavigationEvent)
+bool INavigationWidgetPanelInterface::PanelNavigation(const FNavigationEvent& NavigationEvent)
 {
 	UPanelWidget* PanelWidget = Cast<UPanelWidget>(this);
 	EUINavigation NavigationType = NavigationEvent.GetNavigationType();
@@ -76,7 +76,8 @@ void INavigationWidgetPanelInterface::PanelNavigation(const FNavigationEvent& Na
 		if (PanelWidget->GetChildAt(OnSelctedNumber - 1))
 		{
 			OnSelctedNumber--;
-			OnSelectedChildChangedDelegate.Execute();
+			OnSelectedChildChangedDelegate.Broadcast();
+			return true;
 		}
 	}
 	
@@ -85,7 +86,9 @@ void INavigationWidgetPanelInterface::PanelNavigation(const FNavigationEvent& Na
 		if (PanelWidget->GetChildAt(OnSelctedNumber + 1))
 		{
 			OnSelctedNumber++;
-			OnSelectedChildChangedDelegate.Execute();
+			OnSelectedChildChangedDelegate.Broadcast();
+			return true;
 		}
 	}
+	return false;
 }

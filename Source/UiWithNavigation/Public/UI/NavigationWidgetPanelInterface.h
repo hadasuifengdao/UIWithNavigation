@@ -10,18 +10,17 @@
 #include "Components/PanelWidget.h"
 #include "UI/MyNavigationConfig.h"
 #include "UI/NavigationUserWidget.h"
+#include "Delegates/DelegateCombinations.h"
 #include "NavigationWidgetPanelInterface.generated.h"
 
-//声明无参代理
-
-DECLARE_DELEGATE(FOnSelectedChildChangedDelegate)
-
+DECLARE_MULTICAST_DELEGATE(FOnSelectedChildChangedDelegate)
 /** Interface for assets/objects that can own UserData **/
 UINTERFACE(MinimalApi, meta = (CannotImplementInterfaceInBlueprint))
 class UNavigationWidgetPanelInterface : public UInterface
 {
 	GENERATED_UINTERFACE_BODY()
 };
+
 
 class INavigationWidgetPanelInterface
 {
@@ -46,7 +45,7 @@ public:
 
 	virtual UNavigationUserWidget* GetSelectedChild();
 
-	virtual void PanelNavigation(const FNavigationEvent& NavigationEvent);
+	virtual bool PanelNavigation(const FNavigationEvent& NavigationEvent);
 
 public:
 

@@ -107,6 +107,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	UUIBase* GetCurrentUI();
 
+	EUINavigation GetNavigationDirectionFromKey(const FKeyEvent& InKeyEvent, EUIKeyControlType& UIKeyControlType);
+
 	UFUNCTION(BlueprintCallable)
 	void PrintDebug();
 
@@ -136,4 +138,5 @@ protected:
 	TArray<FName> UIStack;
 
 	bool bdrawDebug = true;
+	TMap<EUIKeyControlType, TSharedRef<FNavigationConfigBase>> UINavigationConfigs;
 };

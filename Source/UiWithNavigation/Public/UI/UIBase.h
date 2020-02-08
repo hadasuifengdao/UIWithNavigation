@@ -26,10 +26,21 @@ public:
 
 	UUIBase(const FObjectInitializer& ObjectInitializer);
 
+	UFUNCTION(BlueprintCallable)
+	void CloseUI();
+
 	FName GetUIID() { return UIID; }
 
 protected:
 	virtual void AddToScreen(ULocalPlayer* LocalPlayer, int32 ZOrder) override;
+
+	/*DealKesyEvent*/
+	virtual bool NativeSupportsKeyboardFocus() const override { return true; }
+	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
+	void DealNavigationEvent(EUIKeyControlType UIKeyControlType, const FNavigationEvent& NavigationEvent);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCosmetic, Category = "Input")
+	bool OnUIEvent(EUIKeyControlType UIKeyControlType, EUINavigation UINavigation);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	UWidgetAnimation* OpenUIAnim(UUserWidget*& AnimWidget);
@@ -39,6 +50,9 @@ protected:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void K2_OnClosed();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	bool K2_UIKeyDown(FKey Key);
 
 private:
 	UFUNCTION()

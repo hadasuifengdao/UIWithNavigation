@@ -5,6 +5,8 @@
 #include "Mode/UiWithNavigationGameMode.h"
 #include "UI/UIManager.h"
 
+bool UMyCheatManager::bUIDebug = false;
+
 void UMyCheatManager::OpenUI(FName sUIID, int32 OpenWay)
 {
     EUIOpenWay OpenWayEnum = EUIOpenWay(OpenWay);
@@ -20,4 +22,8 @@ void UMyCheatManager::ClearUI()
 	{
         AUiWithNavigationGameMode::GetGameMode()->UIManager->Clear();
 	}
+}
+void UMyCheatManager::DebugUI(bool bNewValue)
+{
+    bUIDebug = bNewValue;
 }

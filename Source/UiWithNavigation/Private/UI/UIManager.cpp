@@ -19,6 +19,11 @@ UUIManager::UUIManager()
 	ConstructorHelpers::FObjectFinder<UDataTable> Finder(TEXT("/Game/DataTable/UiDataTable"));
 	UIDataTable = Finder.Object;
 	check(UIDataTable);
+	UINavigationConfigs.Add(EUIKeyControlType::DirectionNavigation, MakeShared<FNavigationDirectionConfig>());
+	UINavigationConfigs.Add(EUIKeyControlType::ChangePage, MakeShared<FNavigationPageConfig>());
+	UINavigationConfigs.Add(EUIKeyControlType::ChangePage2, MakeShared<FNavigationPage2Config>());
+	UINavigationConfigs.Add(EUIKeyControlType::ViewActor, MakeShared<FNavigationViewActorConfig>());
+	UINavigationConfigs.Add(EUIKeyControlType::Confirm, MakeShared<FNavigationConformConfig>());
 }
 
 void UUIManager::OpenUI(FName UIID, EUIOpenWay OpenWay)
@@ -232,7 +237,7 @@ void UUIManager::PrintDebug()
 			UUIBase* UI = it.Value;
 			if (IsValid(UI))
 			{
-				FString UIAnimState = GetEnumValueAsName(TEXT("EPaladinUIAnimState"), UI->AnimState).ToString();
+				FString UIAnimState = GetEnumValueAsName(TEXT("EUIAnimState"), UI->AnimState).ToString();
 
 				UIName = FString::Printf(TEXT("%s(%s)  "), *UIName, *UIAnimState);
 				OpenedUI += UIName;
@@ -275,7 +280,7 @@ void UUIManager::PrintDebug()
 				}
 			}
 		}
-		FString FoucsWidgetInfo = TEXT("FoucsPaladinUserWidget:") + FoucsUWidgetName;
+		FString FoucsWidgetInfo = TEXT("FoucsUserWidget:") + FoucsUWidgetName;
 		GEngine->AddOnScreenDebugMessage((uint64)-1, 0, DebugTextColor, FoucsWidgetInfo);
 
 		//APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
@@ -354,4 +359,23 @@ void UUIManager::PlayWidgetNavigationSound(class UNavigationUserWidgetBase* Widg
 	{
 		UGameplayStatics::SpawnSound2D(GetWorld(), Sound);
 	}
+}
+EUINavigation UUIManager::GetNavigationDirectionFromKey(const FKeyEvent& InKeyEvent, EUIKeyControlType& UIKeyControlType)
+{
+	for (auto& it : UINavigationConfigs)
+	{
+		FNavigationConfigBase& config = it.Value.Get();
+		if (!config.IsProcessRepeatKeyEvent() && InKeyEvent.IsRepeat())
+		{
+			continue;
+		}
+
+		EUINavigation UINavigation = it.Value.Get().GetNavigationDirectionFromKey(InKeyEvent);
+		if (UINavigation != EUINavigation::Invalid)
+		{
+			UIKeyControlType = it.Key;
+			return UINavigation;
+		}
+	}
+	return EUINavigation::Invalid;
 }

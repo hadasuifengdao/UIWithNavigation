@@ -115,19 +115,26 @@ int32 UNavigationUserWidget::GetSelfIndex()
 
 void UNavigationUserWidget::NativeConstruct()
 {
-	if (UPanelWidget* NavigationParentPanel = GetNavigationParentPanel())
+	if (GetNavigationParentPanel())
 	{
-		/*NavigationParentPanel->OnSelectedChildChangedDelegate.AddUniqueDynamic(this, &UNavigationUserWidget::OnNativeParentSelectedChanged);*/
+		if (INavigationWidgetPanelInterface* NavigationParentPanel = Cast<INavigationWidgetPanelInterface>(GetNavigationParentPanel()))
+		{
+			//NavigationParentPanel->OnSelectedChildChangedDelegate.AddUniqueDynamic(this, &UNavigationUserWidget::OnNativeParentSelectedChanged);
+			NavigationParentPanel->OnSelectedChildChangedDelegate.AddUObject(this, &UNavigationUserWidget::OnNativeParentSelectedChanged);
+		}
 	}
-
+	
 	Super::NativeConstruct();
 }
 
 void UNavigationUserWidget::OnNativeParentSelectedChanged()
 {
-	if (UPanelWidget* NavigationParentPanel = GetNavigationParentPanel())
+	if (GetNavigationParentPanel())
 	{
-		/*OnSelectedByParentPanel(NavigationParentPanel->GetSelectedChild() == this);*/
+		if (INavigationWidgetPanelInterface* NavigationParentPanel = Cast<INavigationWidgetPanelInterface>(GetNavigationParentPanel()))
+		{
+			OnSelectedByParentPanel(NavigationParentPanel->GetSelectedChild() == this);
+		}
 	}
 }
 
